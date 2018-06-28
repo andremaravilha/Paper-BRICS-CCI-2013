@@ -1,0 +1,59 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.3'
+    }
+}
+
+// Plugins
+apply plugin: 'java'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+// Project properties
+group 'br.ufmg.ppgee.orcslab'
+version '1.0.0'
+
+// Java version
+sourceCompatibility = 1.8
+
+// Configure repositories
+repositories {
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
+// Gurobi path
+if (!System.properties.containsKey('gurobi.home')) {
+    if ("$System.env.GUROBI_HOME".length() > 0) {
+        System.properties.setProperty('gurobi.home', "$System.env.GUROBI_HOME")
+    }
+}
+
+// Dependencies
+dependencies {
+    compile 'com.beust:jcommander:1.72'
+    compile 'com.github.andremaravilha:jopt:1.2.0'
+    compile files(System.properties['gurobi.home'] + '/lib/gurobi.jar')
+    testCompile 'junit:junit:4.12'
+}
+
+// Configure JAR
+jar {
+    baseName = 'code'
+    classifier = null
+    version = null
+    manifest {
+        attributes(
+                'Main-Class': 'br.ufmg.ppgee.orcslab.code.Main'
+        )
+    }
+}
+
+// Configure JAR with embedded dependencies
+shadowJar {
+    baseName = 'code'
+    classifier = 'all'
+    version = null
+}
